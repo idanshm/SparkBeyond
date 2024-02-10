@@ -3,6 +3,7 @@
 logs_dir="./logs"
 required_tools=("docker" "kubectl" "helm" "minikube" "ifconfig" "sed")
 
+helm_charts_path="$(dirname "$PWD")/charts"
 articles_mount_path="$(dirname "$PWD")/articles"
 docker_registry="registry.dev.svc.cluster.local"
 docker_registry_port=5000
@@ -230,6 +231,13 @@ docker_rebuild() {
     push_docker_image
 }
 
+deploy() {
+  kubectl create namespace monitoring
+  helm install prometheus "${helm_charts_path}/prometheus" -f "${helm_charts_path}/prometheus/values.yaml" -n monitoring
+  helm install grafana "${helm_charts_path}/grafana" -f "${helm_charts_path}/grafana/values.yaml" -n monitoring
+  helm install common-words "${helm_charts_path}/common-words" -f "${helm_charts_path}/common-words/values.yaml" -n default
+}
+
 case $1 in
   init)
     init
@@ -239,6 +247,9 @@ case $1 in
     ;;
   docker-rebuild)
     docker_rebuild
+    ;;
+  deploy)
+    deploy
     ;;
   *)
     echo "Usage: $0 [init|reset|docker-rebuild]"
