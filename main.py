@@ -5,7 +5,6 @@ from collections import Counter
 from typing import List
 from fastapi import FastAPI
 
-
 app = FastAPI()
 
 
@@ -14,7 +13,7 @@ def process_article(file_path: str) -> List[str]:
         text = file.read()
         words = text.split()
         words = [word.strip(string.punctuation).lower() for word in words]
-        stopwords = {'the', 'and', 'of', 'in', 'to', 'a', 'is', 'it', 'that', 'as', 'for'}
+        stopwords = {'the', 'and', 'of', 'in', 'to', 'a', 'is', 'it', 'that', 'as', 'for'}  # Ignore/filter stopwords
         words = [word for word in words if word not in stopwords]
         word_counts = Counter(words)
         most_common_words = word_counts.most_common(10)
@@ -25,7 +24,7 @@ def process_article(file_path: str) -> List[str]:
 def process_articles():
     article_folder = "./articles"
     articles = os.listdir(article_folder)
-    selected_articles = random.sample(articles, k=4)
+    selected_articles = random.sample(articles, k=4)  # Here I decide to choose 4 random articles from the articles folder on each api call. You can this to a list of static article names instead.
     common_words_per_article = {}
     for article in selected_articles:
         file_path = os.path.join(article_folder, article)
@@ -36,4 +35,5 @@ def process_articles():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
