@@ -1,7 +1,9 @@
 # Common-words app instructions
 This app uses FastAPI Python module.  
 It will read all files under the articles folder,  will check if the files are valid txt files.  
-It will then randomly select 4 articles, and return the 10 most common words in each article.
+It will then randomly select 4 articles, and return the 10 most common words in each article.  
+
+The articles folder is mounted to minikube so you can dynamically add or remove articles from the folder.
 
 ## Important!!
 This setup is tested on:  
