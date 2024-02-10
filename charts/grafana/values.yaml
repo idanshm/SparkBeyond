@@ -93,7 +93,7 @@ image:
   registry: docker.io
   # -- Docker image repository
   repository: grafana/grafana
-  # Overrides the Grafana image tag whose default is the common-words appVersion
+  # Overrides the Grafana image tag whose default is the chart appVersion
   tag: ""
   sha: ""
   pullPolicy: IfNotPresent
@@ -226,7 +226,7 @@ serviceMonitor:
   ##
   enabled: false
   path: /metrics
-  #  namespace: monitoring  (defaults to use the namespace this common-words is deployed to)
+  #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
   labels: {}
   interval: 30s
   scheme: http
@@ -248,12 +248,13 @@ hostAliases: []
   #     - "my.host.com"
 
 ingress:
-  enabled: false
+  enabled: true
   # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
   # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
   # ingressClassName: nginx
   # Values can be templated
-  annotations: {}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   labels: {}
@@ -263,7 +264,7 @@ ingress:
   pathType: Prefix
 
   hosts:
-    - common-words-example.local
+    - grafana.local
   ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
   extraPaths: []
   # - path: /*
@@ -281,9 +282,9 @@ ingress:
 
 
   tls: []
-  #  - secretName: common-words-example-tls
+  #  - secretName: chart-example-tls
   #    hosts:
-  #      - common-words-example.local
+  #      - chart-example.local
 
 resources: {}
 #  limits:
@@ -1171,7 +1172,7 @@ imageRenderer:
     ##
     enabled: false
     path: /metrics
-    #  namespace: monitoring  (defaults to use the namespace this common-words is deployed to)
+    #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
     labels: {}
     interval: 1m
     scheme: http

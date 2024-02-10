@@ -366,7 +366,7 @@ dashboards:
           "version": 1
         }
     custom-dashboard:
-      # This is a path to a file inside the dashboards directory inside the common-words directory
+      # This is a path to a file inside the dashboards directory inside the chart directory
       file: dashboards/custom-dashboard.json
     prometheus-stats:
       # Ref: https://grafana.com/dashboards/2

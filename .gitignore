@@ -97,3 +97,4 @@ ENV/
 env.bak/
 venv.bak/
 .idea/
+scripts/logs
