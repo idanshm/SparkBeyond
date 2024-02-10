@@ -4,8 +4,10 @@ import string
 from collections import Counter
 from typing import List
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
+Instrumentator().instrument(app).expose(app)
 
 
 def process_article(file_path: str) -> List[str]:
@@ -20,7 +22,7 @@ def process_article(file_path: str) -> List[str]:
         return [word for word, _ in most_common_words]
 
 
-@app.get("/process_articles")
+@app.get("/")
 def process_articles():
     article_folder = "./articles"
     articles = os.listdir(article_folder)
