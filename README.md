@@ -15,9 +15,36 @@ Codename:	jammy
 
 Please make sure you are testing on a clean Ubuntu installation and the same release.
 
+## Deploy stetps:
+```bash
+$ cd ./scripts
+```
+
+```bash
+$ prepareEnv.sh init
+Initializing environment...
+Checking if docker is installed...OK
+Checking if kubectl is installed...OK
+Checking if helm is installed...OK
+Checking if minikube is installed...OK
+Checking if ifconfig is installed...OK
+Checking if sed is installed...OK
+Installing docker local registry...OK
+Setting up Docker insecure registries...OK
+Restarting docker daemon...OK
+Adding local registry DNS record to /etc/hosts...OK
+Building docker image...OK
+Pushing docker image to local registry...OK
+Starting minikube...OK
+Installing minikube ingress addon...OK
+Setting up fixed ip address 172.16.1.1...OK
+Adding docker local registry DNS record to minikube...OK
+```  
+```bash
+$ prepareEnv.sh deploy
+```
 ## Deploy script usage:
-**script logs can be found under ./scripts/logs dir  
-cd to ./scripts dir
+
 
 ### Init environment:
 Initialize the environment.  
@@ -49,5 +76,12 @@ Create monitoring namespace and deploy the helm charts.
 $ prepareEnv.sh deploy
 ```
 
+## Grafana
+Ingress is enabled, visit http://grafana.local  
+Default user: admin  
+Default password: admin  
 
+## Prometheus
+Ingress is enabled, visit http://prometheus.local  
+Added scrape job for common-words app.  
 
