@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: registry.dev.svc.cluster.local:5000/common-words
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 resources:
   requests:

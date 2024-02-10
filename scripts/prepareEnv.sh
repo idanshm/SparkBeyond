@@ -1,13 +1,6 @@
 #!/bin/bash
-sudo -v
 
 logs_dir="./logs"
-
-if [ ! -d $logs_dir ]
-then
-    mkdir $logs_dir
-fi
-
 articles_mount_path="./articles"
 docker_registry="registry.dev.svc.cluster.local"
 docker_registry_port=5000
@@ -19,6 +12,13 @@ add_timestamp() {
     while IFS= read -r line; do
         echo -e "'\e[90m'[$timestamp] \e[34m[$1]: \e[0m$line"
     done
+}
+
+create_logs_dir() {
+    if [ ! -d $logs_dir ]
+    then
+        mkdir $logs_dir
+    fi
 }
 
 installations_pre_check () {
@@ -198,8 +198,49 @@ start_minikube () {
     sudo sed -i "/^127\.0\.0\.1[[:space:]]\+localhost $docker_registry$/a $(minikube ip)       common-words.local" /etc/hosts
 }
 
-installations_pre_check
-install_docker_local_registry
-build_docker_image
-push_docker_image
-start_minikube
+init() {
+    sudo -v
+    echo "Initializing environment..."
+    create_logs_dir
+    installations_pre_check
+    install_docker_local_registry
+    build_docker_image
+    push_docker_image
+    start_minikube
+}
+
+reset() {
+    sudo -v
+    echo "Resetting environment..."
+    minikube delete
+    docker rm -f $(docker ps -aq)
+    docker rmi -f $(docker images -aq)
+    sudo rm -rf /etc/docker
+    sudo cp ./hosts /etc/hosts
+    echo "env reset done!"
+
+    exit 0
+}
+
+docker_rebuild() {
+    echo "Starting docker image rebuild..."
+    build_docker_image
+    push_docker_image
+}
+
+case $1 in
+  init)
+    init
+    ;;
+  reset)
+    reset
+    ;;
+  docker-rebuild)
+    docker_rebuild
+    ;;
+  *)
+    echo "Usage: $0 [init|reset|docker-rebuild]"
+    exit 1
+    ;;
+esac
+
