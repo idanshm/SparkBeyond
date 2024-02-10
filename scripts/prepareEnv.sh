@@ -1,6 +1,8 @@
 #!/bin/bash
 
 logs_dir="./logs"
+required_tools=("docker" "kubectl" "helm" "minikube" "ifconfig" "sed")
+
 articles_mount_path="./articles"
 docker_registry="registry.dev.svc.cluster.local"
 docker_registry_port=5000
@@ -22,10 +24,10 @@ create_logs_dir() {
 }
 
 installations_pre_check () {
-    for tool in "docker" "kubectl" "helm" "minikube" "ifconfig" "sed" 
+    for tool in "${required_tools[@]}"
     do
         echo -n "Checking if $tool is installed..."
-        if ! command -v $tool &> /dev/null
+        if ! command -v "$tool" &> /dev/null
         then
             echo "Missing"
             exit 1
