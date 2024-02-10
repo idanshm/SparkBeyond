@@ -12,6 +12,10 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      volumes:
+        - name: articles-volume
+          hostPath:
+            path: /mnt/articles
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -20,3 +24,6 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           ports:
             - containerPort: {{ .Values.service.port }}
+          volumeMounts:
+            - name: articles-volume
+              mountPath: /app/articles

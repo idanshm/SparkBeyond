@@ -3,7 +3,7 @@
 logs_dir="./logs"
 required_tools=("docker" "kubectl" "helm" "minikube" "ifconfig" "sed")
 
-articles_mount_path="./articles"
+articles_mount_path="$(dirname "$PWD")/articles"
 docker_registry="registry.dev.svc.cluster.local"
 docker_registry_port=5000
 docker_image="common-words"
@@ -99,7 +99,7 @@ build_docker_image () {
     
     # Build our docker image
     echo -n "Building docker image..."
-    docker build . -t ${docker_registry}:${docker_registry_port}/${docker_image}:${docker_tag} > $output_file 2>&1
+    docker build -f ../Dockerfile .. -t ${docker_registry}:${docker_registry_port}/${docker_image}:${docker_tag} > $output_file 2>&1
     local exit_code=$?
 
     add_timestamp "${FUNCNAME[0]}"< $output_file >> $log_file
@@ -138,7 +138,7 @@ start_minikube () {
     local output_file="/tmp/docker_output.log"
 
     echo -n "Starting minikube..."
-    minikube start --insecure-registry="${docker_registry}:${docker_registry_port}" --mount --mount-string ${articles_mount_path}:/app/articles > $output_file 2>&1
+    minikube start --insecure-registry="${docker_registry}:${docker_registry_port}" --mount --mount-string "${articles_mount_path}:/mnt/articles" > $output_file 2>&1
     local exit_code=$?
 
     add_timestamp "${FUNCNAME[0]}"< $output_file >> $log_file
@@ -197,7 +197,7 @@ start_minikube () {
     fi
 
     # Add DNS record to our minikube
-    sudo sed -i "/^127\.0\.0\.1[[:space:]]\+localhost $docker_registry$/a $(minikube ip)       common-words.local" /etc/hosts
+    sudo sed -i "/^127\.0\.0\.1[[:space:]]\+localhost $docker_registry$/a $(minikube ip)       common-words.local       prometheus.local       grafana.local" /etc/hosts
 }
 
 init() {

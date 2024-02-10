@@ -1,4 +1,5 @@
 import os
+import subprocess
 import random
 import string
 from collections import Counter
@@ -22,17 +23,34 @@ def process_article(file_path: str) -> List[str]:
         return [word for word, _ in most_common_words]
 
 
+def is_text_file(file_path):
+    try:
+        output = subprocess.check_output(['file', '--mime', '--brief', file_path])
+        return output.decode().split(';')[0].strip() == 'text/plain'
+    except subprocess.CalledProcessError:
+        return False
+
+
+def get_text_files_in_folder(folder_path):
+    return [file for file in os.listdir(folder_path) if is_text_file(os.path.join(folder_path, file))]
+
+
 @app.get("/")
-def process_articles():
+async def process_articles():
     article_folder = "./articles"
-    articles = os.listdir(article_folder)
-    selected_articles = random.sample(articles, k=4)  # Here I decide to choose 4 random articles from the articles folder on each api call. You can this to a list of static article names instead.
-    common_words_per_article = {}
-    for article in selected_articles:
-        file_path = os.path.join(article_folder, article)
-        common_words = process_article(file_path)
-        common_words_per_article[article] = common_words
-    return common_words_per_article
+    articles = get_text_files_in_folder(article_folder)
+    if len(articles) < 4:
+        return "You need to have at least 4 articles in the articles folder."
+    if articles:
+        selected_articles = random.sample(articles, k=4)  # Here I decide to choose 4 random articles from the articles folder on each api call. You can this to a list of static article names instead.
+        common_words_per_article = {}
+        for article in selected_articles:
+            file_path = os.path.join(article_folder, article)
+            common_words = process_article(file_path)
+            common_words_per_article[article] = common_words
+        return common_words_per_article
+    else:
+        return "Couldn't find any valid articles ):"
 
 
 if __name__ == "__main__":
