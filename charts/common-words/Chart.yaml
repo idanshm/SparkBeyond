@@ -1,0 +1,4 @@
+apiVersion: v2
+name: common-words-chart
+description: A Helm common-words for deploying common-words app.
+version: 0.1.0
