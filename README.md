@@ -16,6 +16,7 @@ Codename:	jammy
 Please make sure you are testing on a clean Ubuntu installation and the same release.
 
 ## Deploy stetps:
+required tools: docker, kubectl, helm, minikube, ifconfig, sed
 ```bash
 $ cd ./scripts
 ```
