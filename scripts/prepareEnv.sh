@@ -198,7 +198,7 @@ start_minikube () {
     fi
 
     # Add DNS record to our minikube
-    sudo sed -i "/^127\.0\.0\.1[[:space:]]\+localhost $docker_registry$/a $(minikube ip)       common-words.local       prometheus.local       grafana.local       loki.local" /etc/hosts
+    sudo sed -i "/^127\.0\.0\.1[[:space:]]\+localhost $docker_registry$/a $(minikube ip)       common-words.local prometheus.local grafana.local loki.local" /etc/hosts
 }
 
 init() {
@@ -237,12 +237,18 @@ deploy() {
         echo "namespace monitoring not found"
         kubectl create namespace monitoring
     fi
+    if ! kubectl get namespace logging > /dev/null 2>&1
+    then
+        echo "namespace logging not found"
+        kubectl create namespace logging
+    fi
+
     echo "Waiting for nginx-ingress-controller to become Ready..."
     kubectl get pod -n ingress-nginx | grep ingress-nginx-controller | awk '{print $1}' | xargs kubectl wait pod --for=condition=Ready --timeout=300s -n ingress-nginx
     echo "Deploying prometheus..."
     helm install prometheus "${helm_charts_path}/prometheus" -f "${helm_charts_path}/prometheus/values.yaml" -n monitoring --wait --timeout 5m
     echo "Deploying loki..."
-    helm install loki "${helm_charts_path}/loki-stack" -f "${helm_charts_path}/loki-stack/values.yaml" -n monitoring --wait --timeout 5m
+    helm install loki "${helm_charts_path}/loki" -f "${helm_charts_path}/loki/values.yaml" -n logging --wait --timeout 5m
     echo "Deploying grafana..."
     helm install grafana "${helm_charts_path}/grafana" -f "${helm_charts_path}/grafana/values.yaml" -n monitoring --wait --timeout 5m
     echo "Deploying common-words..."
