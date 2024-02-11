@@ -232,10 +232,19 @@ docker_rebuild() {
 }
 
 deploy() {
-  kubectl create namespace monitoring
-  helm install prometheus "${helm_charts_path}/prometheus" -f "${helm_charts_path}/prometheus/values.yaml" -n monitoring
-  helm install grafana "${helm_charts_path}/grafana" -f "${helm_charts_path}/grafana/values.yaml" -n monitoring
-  helm install common-words "${helm_charts_path}/common-words" -f "${helm_charts_path}/common-words/values.yaml" -n default
+    if ! kubectl get namespace monitoring > /dev/null 2>&1
+    then
+        echo "namespace monitoring not found"
+        kubectl create namespace monitoring
+    fi
+    echo "Waiting for nginx-ingress-controller to become Ready..."
+    kubectl get pod -n ingress-nginx | grep ingress-nginx-controller | awk '{print $1}' | xargs kubectl wait pod --for=condition=Ready --timeout=300s -n ingress-nginx
+    echo "Deploying prometheus..."
+    helm install prometheus "${helm_charts_path}/prometheus" -f "${helm_charts_path}/prometheus/values.yaml" -n monitoring --wait --timeout 5m
+    echo "Deploying grafana..."
+    helm install grafana "${helm_charts_path}/grafana" -f "${helm_charts_path}/grafana/values.yaml" -n monitoring --wait --timeout 5m
+    echo "Deploying common-words..."
+    helm install common-words "${helm_charts_path}/common-words" -f "${helm_charts_path}/common-words/values.yaml" -n default --wait --timeout 5m
 }
 
 case $1 in
